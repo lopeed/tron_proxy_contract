@@ -1,39 +1,38 @@
-// migrations/MM_upgrade_uups_box.js
-const TransparentUpgradeableProxy = artifacts.require(
-    '@openzeppelin/upgrades-core/artifacts/@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol/TransparentUpgradeableProxy.json'
-);
-const Box = artifacts.require('UUPSBox');
-const BoxV2 = artifacts.require('UUPSBoxV2');
+const UUPSBox = artifacts.require("UUPSBox");
+const UUPSBoxV2 = artifacts.require("UUPSBoxV2");
 
 module.exports = async function (deployer) {
     try {
-        // Deploy the new BoxV2 implementation contract
-        await deployer.deploy(BoxV2);
+        // Despliega la primera versión del contrato (UUPSBox)
+        await deployer.deploy(UUPSBox);
+        const uupsBox = await UUPSBox.deployed();
 
-        // Upgrade proxy contract
-        const proxyContract = await TransparentUpgradeableProxy.at(Box.address);
-        await proxyContract.upgradeTo(BoxV2.address);
-        console.info('Upgraded', Box.address);
+        // Inicializa la primera versión del contrato
+        await uupsBox.initialize();
+        console.info("Initial UUPSBox deployed at", uupsBox.address);
 
-        // Call proxy contract
-        const box = await BoxV2.at(Box.address);
-        const beforeValue = await box.value();
-        console.info('Value before', beforeValue.toNumber());
+        // Obtén el valor antes de actualizar
+        let beforeValue = await uupsBox.getValue();
+        console.info("Value before upgrade:", beforeValue.toNumber());
 
-        // Set new Value
-        await box.setValue(beforeValue.toNumber() + 100);
-        const afterValue = await box.value();
-        console.info('Value after', afterValue.toNumber());
+        // Despliega la segunda versión del contrato (UUPSBoxV2)
+        await deployer.deploy(UUPSBoxV2);
+        const uupsBoxV2 = await UUPSBoxV2.deployed();
 
-        // Read new V2 Value
-        const beforeValueV2 = await box.valueV2();
-        console.info('ValueV2 before', beforeValueV2.toNumber());
+        // Realiza la actualización de UUPSBox a UUPSBoxV2
+        await uupsBox.upgradeTo(uupsBoxV2.address);
+        console.info("UUPSBox upgraded to UUPSBoxV2 at", uupsBoxV2.address);
 
-        // Set new V2 Value
-        await box.setValueV2(beforeValueV2.toNumber() + 100);
-        const afterValueV2 = await box.valueV2();
-        console.info('ValueV2 after', afterValueV2.toNumber());
+        // Interactúa con el contrato actualizado (UUPSBoxV2)
+        let afterValue = await uupsBox.getValue();
+        console.info("Value after upgrade:", afterValue.toNumber());
+
+        // Usa las nuevas funciones de UUPSBoxV2
+        await uupsBox.setValueV2(afterValue.toNumber() + 200);
+        let newV2Value = await uupsBox.getValueV2();
+        console.info("New ValueV2:", newV2Value.toNumber());
+        
     } catch (error) {
-        console.error('UUPS: upgrade box error', error);
+        console.error("UUPS upgrade error:", error);
     }
 };

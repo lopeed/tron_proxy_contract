@@ -28,7 +28,7 @@ Then, run the migration with:
       network_id: '2'
     },
     nile: {
-      privateKey: process.env.PRIVATE_KEY_NILE,
+      privateKey: 'a8024e2b6a851118069f2d7b9dd47e849a22fe9051b5fad9ca1df5c7f38f5efb',
       userFeePercentage: 100,
       feeLimit: 1000 * 1e6,
       fullHost: 'https://nile.trongrid.io',
@@ -44,7 +44,7 @@ Then, run the migration with:
     },
     compilers: {
       solc: {
-        version: '0.8.6'
+        version: '0.8.20'
       }
     }
   },
