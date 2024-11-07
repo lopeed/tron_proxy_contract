@@ -8,18 +8,14 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract Implementation is Initializable, ERC20Upgradeable, UUPSUpgradeable, OwnableUpgradeable {
     
-    uint256 public value;
-
     // Inicialización del contrato
     function initialize(
         string memory name,
         string memory symbol,
-        uint256 initialSupply,
-        uint256 _value
+        uint256 initialSupply
     ) public initializer {
         __ERC20_init(name, symbol);
         _mint(_msgSender(), initialSupply);
-        value = _value;
         __Ownable_init();
         __UUPSUpgradeable_init();
     }
@@ -27,8 +23,13 @@ contract Implementation is Initializable, ERC20Upgradeable, UUPSUpgradeable, Own
     // Esta función autoriza quien puede actualizar el contrato
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
-    // Función para cambiar el valor
-    function setValue(uint256 newValue) public {
-        value = newValue;
+    // Función para mintear más tokens
+    function addSupply(uint256 newSupply) public onlyOwner {
+        _mint(_msgSender(), newSupply);
     }
+
+    function burn(uint256 amount) public {
+    _burn(msg.sender, amount);
+    }
+ 
 }

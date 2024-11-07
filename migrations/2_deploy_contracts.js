@@ -1,24 +1,17 @@
-const { deployProxy, upgradeProxy } = require('@openzeppelin/truffle-upgrades');
-
+const { deployProxy } = require('@openzeppelin/truffle-upgrades');
 const Implementation = artifacts.require("Implementation");
-const UUPSBox = artifacts.require("UUPSBox");
 
-module.exports = async function (deployer, network, accounts) {
-    // Desplegar la implementación del contrato de token
+module.exports = async function (deployer) {
+  try {
+    // Despliega el proxy e inicializa con los argumentos especificados
     const implementationInstance = await deployProxy(
-        Implementation, 
-        ['SimbadProxy', 'SPRXY', '100000000000000000000000',100], 
-        { deployer, kind: 'uups' }
+      Implementation,
+      ['SimbadProxy', 'SPRXY', '100000000000000000000000'], // Argumentos de la función `initialize`
+      { deployer, kind: 'uups' }
     );
 
-    // Desplegar el proxy UUPS configurado para la implementación del contrato de token
-    const proxyInstance = await deployProxy(
-        UUPSBox, 
-        [], 
-        { deployer, kind: 'uups' }
-    );
-
-    // Ahora el contrato de token debería estar accesible a través del proxy
-    console.log('Implementation contract deployed at:', implementationInstance.address);
-    console.log('Proxy contract deployed at:', proxyInstance.address);
+    console.log('Proxy contract deployed at:', implementationInstance.address);
+  } catch (error) {
+    console.error('Error during deployment:', error);
+  }
 };
