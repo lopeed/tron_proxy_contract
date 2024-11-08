@@ -6,16 +6,14 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-contract Implementation is Initializable, ERC20Upgradeable, UUPSUpgradeable, OwnableUpgradeable {
+contract LopeedToken is Initializable, ERC20Upgradeable, UUPSUpgradeable, OwnableUpgradeable {
     
     // Inicialización del contrato
     function initialize(
-        string memory name,
-        string memory symbol,
-        uint256 initialSupply
+        string memory _name,
+        string memory _symbol,
     ) public initializer {
-        __ERC20_init(name, symbol);
-        _mint(_msgSender(), initialSupply);
+        __ERC20_init(_name, _symbol);
         __Ownable_init();
         __UUPSUpgradeable_init();
     }
@@ -24,7 +22,7 @@ contract Implementation is Initializable, ERC20Upgradeable, UUPSUpgradeable, Own
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     // Función para mintear más tokens
-    function addSupply(uint256 newSupply) public onlyOwner {
+    function mint(uint256 newSupply) public onlyOwner {
         _mint(_msgSender(), newSupply);
     }
 

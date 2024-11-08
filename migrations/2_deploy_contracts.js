@@ -1,13 +1,13 @@
 const { deployProxy } = require('@openzeppelin/truffle-upgrades');
-const Implementation = artifacts.require("Implementation");
+const LopeedToken = artifacts.require('LopeedToken');
 
 module.exports = async function (deployer) {
   try {
     // Despliega el proxy e inicializa con los argumentos especificados
     const implementationInstance = await deployProxy(
-      Implementation,
-      ['SimbadProxy', 'SPRXY', '100000000000000000000000'], // Argumentos de la función `initialize`
-      { deployer, kind: 'uups' }
+      LopeedToken,
+      ['Lopeed', 'LPT'], // Argumentos de la función `initialize`
+      { deployer, initializer: 'initialize', kind: 'uups' }
     );
 
     console.log('Proxy contract deployed at:', implementationInstance.address);
